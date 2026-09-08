@@ -1,3 +1,4 @@
+![Build](https://github.com/miguelkrsoul/livro-api/actions/workflows/maven.yml/badge.svg)
 # 📚 Livro API - Java Spring Boot
 
 API REST para cadastro de livros, criada para estudos de Java.
