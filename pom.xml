@@ -9,7 +9,7 @@
         <version>3.2.5</version>
         <relativePath/>
     </parent>
-    <groupId>com.miguel</groupId>
+    <groupId>com.miguelkrsoul</groupId>
     <artifactId>livro-api</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>livro-api</name>
