@@ -12,7 +12,11 @@ API REST para cadastro de livros, criada para estudos de Java.
 - **Maven** - Gerenciador de dependências
 
 ## 📦 Endpoints
+- GET /livros - Lista todos
+- GET /livros/{id} - Busca por ID
+- POST /livros - Cria um livro
 - PUT /livros/{id} - Atualiza um livro
+- DELETE /livros/{id} - Deleta um livro
 
 ## 👨‍💻 Autor
 Miguel Santos - [miguelkrsoul](https://github.com/miguelkrsoul)
