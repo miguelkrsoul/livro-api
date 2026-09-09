@@ -1,7 +1,13 @@
 ![Build](https://github.com/miguelkrsoul/livro-api/actions/workflows/maven.yml/badge.svg)
-# 📚 Livro API - Java Spring Boot
+# Livro API 📚 - Online!
 
-API REST para cadastro de livros, criada para estudos de Java.
+API rodando em: https://livro-api-9t7z.onrender.com/swagger-ui.html
+
+Endpoints:
+- GET /livros
+- POST /livros
+
+Feito com Java + Spring Boot + Docker + Render
 
 ## 🚀 Tecnologias
 - **Java 17**
