@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Biblioteca - Império Guaxinim</title>
+<style>
+body{background:#0f0f19;color:#fff;font-family:Arial;margin:0;padding:20px}
+h1{text-align:center}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:15px;margin-top:20px}
+.card{background:#1e1e2f;border-radius:12px;overflow:hidden;cursor:pointer;transition:0.3s}
+.card:hover{transform:scale(1.05)}
+.card img{width:100%;height:220px;object-fit:cover}
+.card div{padding:10px}
+.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);justify-content:center;align-items:center;padding:20px;box-sizing:border-box}
+.modal-content{background:#1e1e2f;padding:20px;border-radius:12px;max-width:500px;width:100%;max-height:90vh;overflow-y:auto}
+.close{float:right;font-size:24px;cursor:pointer}
+</style>
+</head>
+<body>
+<h1>📚 Biblioteca Online - 100% pelo celular</h1>
+<p style="text-align:center">API: livro-api-9t7z.onrender.com - Livros permanentes!</p>
+<div id="grid" class="grid">Carregando livros...</div>
+
+<div id="modal" class="modal" onclick="fechar()">
+<div class="modal-content" onclick="event.stopPropagation()">
+<span class="close" onclick="fechar()">&times;</span>
+<img id="mCapa" style="width:100%;height:300px;object-fit:cover;border-radius:8px">
+<h2 id="mTitulo"></h2>
+<p id="mAutor"></p>
+<p id="mDesc"></p>
+<hr>
+<p id="mConteudo" style="white-space:pre-wrap;line-height:1.6"></p>
+</div>
+</div>
+
+<script>
+async function carregar(){
+  try{
+    let r = await fetch('/livros');
+    let livros = await r.json();
+    if(!livros.length) throw "vazio";
+    mostrar(livros);
+  }catch(e){
+    document.getElementById('grid').innerHTML="<p>API acordando... aguarde 30s e recarregue a página. Enquanto isso mostrando exemplos.</p>";
+    mostrar([
+      {titulo:'Dom Casmurro',autor:'Machado de Assis',capaUrl:'https://covers.openlibrary.org/b/id/8264456-L.jpg',descricao:'Clássico brasileiro',conteudo:'Era uma vez... Capítulo 1 - Do título'},
+      {titulo:'O Cortiço',autor:'Aluísio Azevedo',capaUrl:'https://covers.openlibrary.org/b/id/8231856-L.jpg',descricao:'Vida no cortiço',conteudo:'João Romão era dono...'},
+      {titulo:'Vidas Secas',autor:'Graciliano Ramos',capaUrl:'https://covers.openlibrary.org/b/id/8306096-L.jpg',descricao:'Família no sertão',conteudo:'Na planície avermelhada...'}
+    ]);
+  }
+}
+function mostrar(livros){
+  let g=document.getElementById('grid'); g.innerHTML='';
+  livros.forEach(l=>{
+    let c=document.createElement('div'); c.className='card';
+    c.innerHTML=`<img src="${l.capaUrl||'https://via.placeholder.com/160x220'}"><div><b>${l.titulo}</b><br><small>${l.autor||''}</small></div>`;
+    c.onclick=()=>abrir(l); g.appendChild(c);
+  });
+}
+function abrir(l){
+  document.getElementById('mCapa').src=l.capaUrl;
+  document.getElementById('mTitulo').innerText=l.titulo;
+  document.getElementById('mAutor').innerText=l.autor;
+  document.getElementById('mDesc').innerText=l.descricao;
+  document.getElementById('mConteudo').innerText=l.conteudo||"Conteúdo em breve...";
+  document.getElementById('modal').style.display='flex';
+}
+function fechar(){document.getElementById('modal').style.display='none';}
+carregar();
+</script>
+</body>
+</html>
