@@ -27,7 +27,9 @@ public class LivroController {
     @DeleteMapping("/{id}")
     public void deletar(@PathVariable Long id) {
         repo.deleteById(id);
-    }     @PutMapping("/{id}")
+    }    
+    
+    @PutMapping("/{id}")
     public Livro atualizar(@PathVariable Long id, @RequestBody Livro livroAtualizado) {
         return repo.findById(id).map(l -> {
             l.setTitulo(livroAtualizado.getTitulo());
