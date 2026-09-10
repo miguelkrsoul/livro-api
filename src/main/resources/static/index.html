@@ -37,7 +37,7 @@ h1{text-align:center}
 <script>
 async function carregar(){
   try{
-    let r = await fetch('/livros');
+    let r = await fetch('https://livro-api-9t7z.onrender.com/livros');
     let livros = await r.json();
     if(!livros.length) throw "vazio";
     mostrar(livros);
@@ -54,7 +54,7 @@ function mostrar(livros){
   let g=document.getElementById('grid'); g.innerHTML='';
   livros.forEach(l=>{
     let c=document.createElement('div'); c.className='card';
-    c.innerHTML=`<img src="${l.capaUrl||'https://via.placeholder.com/160x220'}"><div><b>${l.titulo}</b><br><small>${l.autor||''}</small></div>`;
+    c.innerHTML=`<img src="${l.capaUrl}" onerror="this.src='https://via.placeholder.com/160x220?text='+encodeURIComponent(l.titulo)"><div><b>${l.titulo}</b><br><small>${l.autor||''}</small></div>`;
     c.onclick=()=>abrir(l); g.appendChild(c);
   });
 }
