@@ -1,4 +1,4 @@
-package com.example.livroapi.model;
+package com.miguelkrsoul.livroapi.model;
 
 import jakarta.persistence.*;
 
