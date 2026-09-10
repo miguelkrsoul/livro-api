@@ -7,15 +7,15 @@
 body{background:#0f0f19;color:#fff;font-family:Arial;margin:0;padding:20px}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:15px}
 .card{background:#1e1e2f;border-radius:12px;overflow:hidden;position:relative;cursor:pointer}
-.card img{width:100%;height:220px;object-fit:cover}
+.card img{width:100%;height:220px;object-fit:cover;background:#2d2d44}
 .card div{padding:10px}
 .del{position:absolute;top:5px;right:5px;background:red;border:none;border-radius:50%;width:28px;height:28px;color:#fff;cursor:pointer;z-index:2}
 .edit{position:absolute;top:5px;right:38px;background:#6c5ce7;border:none;border-radius:50%;width:28px;height:28px;color:#fff;cursor:pointer;z-index:2}
 .btn{background:#6c5ce7;color:#fff;border:none;padding:12px 20px;border-radius:8px;cursor:pointer;margin:5px}
-.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);justify-content:center;align-items:center;z-index:10}
-.modal-content{background:#1e1e2f;padding:20px;border-radius:12px;max-width:600px;width:90%;max-height:90vh;overflow-y:auto}
+.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.92);justify-content:center;align-items:center;z-index:10;padding:10px;box-sizing:border-box}
+.modal-content{background:#1e1e2f;padding:20px;border-radius:12px;max-width:700px;width:95%;max-height:92vh;overflow-y:auto}
 input,textarea{width:100%;padding:10px;margin:8px 0;border-radius:6px;border:none;box-sizing:border-box}
-#mConteudo{white-space:pre-wrap;background:#0f0f19;padding:15px;border-radius:8px;line-height:1.6}
+#mConteudo{white-space:pre-wrap;background:#0f0f19;padding:15px;border-radius:8px;line-height:1.7;max-height:50vh;overflow-y:auto;font-size:16px}
 #adminBar{text-align:center;margin-bottom:15px}
 </style>
 </head>
@@ -24,39 +24,29 @@ input,textarea{width:100%;padding:10px;margin:8px 0;border-radius:6px;border:non
 <div id="adminBar"><span id="statusADM"></span><br><button class="btn" style="background:#444" onclick="loginADM()">🔒 Login ADM</button> <button class="btn" style="background:#222" onclick="logoutADM()">Sair</button></div>
 <div style="text-align:center;margin:20px"><button id="btnAdd" class="btn" onclick="abrirAdd()">+ Adicionar Livro</button> <button class="btn" style="background:#2d2d44" onclick="carregar()">🔄 Atualizar</button></div>
 <div id="grid" class="grid"></div>
-
 <div id="addModal" class="modal"><div class="modal-content"><h2 id="addTitle">+ Novo Livro</h2>
-<input id="nTitulo" placeholder="Título"><input id="nAutor" placeholder="Autor"><input id="nCapa" placeholder="Link da capa"><textarea id="nDesc" placeholder="Descrição"></textarea><textarea id="nConteudo" placeholder="Conteúdo"></textarea>
+<input id="nTitulo" placeholder="Título"><input id="nAutor" placeholder="Autor"><input id="nCapa" placeholder="Link da capa"><textarea id="nDesc" placeholder="Descrição"></textarea><textarea id="nConteudo" rows="10" placeholder="Conteúdo completo do livro"></textarea>
 <button class="btn" onclick="salvar()">Salvar</button> <button class="btn" style="background:#444" onclick="fecharAdd()">Fechar</button></div></div>
-
-<div id="modal" class="modal" onclick="this.style.display='none'"><div class="modal-content" onclick="event.stopPropagation()"><h2 id="mTitulo"></h2><p id="mAutor"></p><p id="mDesc"></p><div id="mConteudo"></div></div></div>
-
+<div id="modal" class="modal" onclick="this.style.display='none'"><div class="modal-content" onclick="event.stopPropagation()"><h2 id="mTitulo"></h2><p id="mAutor"></p><p id="mDesc" style="color:#a29bfe"></p><div id="mConteudo"></div><br><button class="btn" style="background:#444;width:100%" onclick="document.getElementById('modal').style.display='none'">Fechar livro</button></div></div>
 <script>
 const API='https://livro-api-9t7z.onrender.com/livros';
 const SENHA_ADM='guaxinin123';
-let editandoId=null;
-let livrosCache=[];
+let editandoId=null;let livrosCache=[];
 function ehADM(){return localStorage.getItem('ehADM')==='true';}
 function atualizarBarra(){document.getElementById('statusADM').innerText=ehADM()?'✅ ADM - pode adicionar/editar/apagar':'👁️ Visitante - só pode ver';document.getElementById('btnAdd').style.display=ehADM()?'inline-block':'none';}
 function loginADM(){let s=prompt('Senha ADM:');if(s===SENHA_ADM){localStorage.setItem('ehADM','true');alert('Logado!');atualizarBarra();carregar();}else if(s!==null)alert('Errada!');}
 function logoutADM(){localStorage.removeItem('ehADM');atualizarBarra();carregar();}
 function abrirAdd(){editandoId=null;addTitle.innerText='+ Novo Livro';nTitulo.value=nAutor.value=nCapa.value=nDesc.value=nConteudo.value='';addModal.style.display='flex';}
 function fecharAdd(){addModal.style.display='none';}
-function abrirEditar(id,e){
- e.stopPropagation();
- let l=livrosCache.find(x=>x.id===id);
- editandoId=id;addTitle.innerText='✏️ Editar Livro';
- nTitulo.value=l.titulo||'';nAutor.value=l.autor||'';nCapa.value=l.capaUrl||'';nDesc.value=l.descricao||'';nConteudo.value=l.conteudo||'';
- addModal.style.display='flex';
-}
+function abrirEditar(id,e){e.stopPropagation();let l=livrosCache.find(x=>x.id===id);editandoId=id;addTitle.innerText='✏️ Editar Livro';nTitulo.value=l.titulo||'';nAutor.value=l.autor||'';nCapa.value=l.capaUrl||'';nDesc.value=l.descricao||'';nConteudo.value=l.conteudo||'';addModal.style.display='flex';}
+function fallbackCapa(img,titulo){img.onerror=null;img.src='https://via.placeholder.com/300x400/6c5ce7/ffffff?text='+encodeURIComponent(titulo);}
 async function carregar(){
  let r=await fetch(API);livrosCache=await r.json();let g=document.getElementById('grid');g.innerHTML='';
  livrosCache.forEach(l=>{
   let c=document.createElement('div');c.className='card';
-  let capa=l.capaUrl||'https://via.placeholder.com/300x400/6c5ce7/ffffff?text='+encodeURIComponent(l.titulo);
   let botoes=ehADM()?`<button class="del" onclick="deletar(${l.id},event)">X</button><button class="edit" onclick="abrirEditar(${l.id},event)">✏️</button>`:'';
-  c.innerHTML=`${botoes}<img src="${capa}"><div><b>${l.titulo}</b><br><small>${l.autor||''}</small></div>`;
-  c.onclick=()=>{mTitulo.innerText=l.titulo;mAutor.innerText=l.autor||'';mDesc.innerText=l.descricao||'';mConteudo.innerText=l.conteudo||'';modal.style.display='flex'};
+  c.innerHTML=`${botoes}<img src="${l.capaUrl||''}" onerror="fallbackCapa(this,'${l.titulo.replace(/'/g,'')}')" alt="${l.titulo}"><div><b>${l.titulo}</b><br><small>${l.autor||''}</small></div>`;
+  c.onclick=()=>{mTitulo.innerText=l.titulo;mAutor.innerText=l.autor||'';mDesc.innerText=l.descricao||'';mConteudo.innerText=l.conteudo||'Sem conteúdo';modal.style.display='flex';mConteudo.scrollTop=0};
   g.appendChild(c);
  });atualizarBarra();
 }
