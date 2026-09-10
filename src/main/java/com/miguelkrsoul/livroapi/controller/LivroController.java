@@ -1,53 +1,36 @@
-package com.miguelkrsoul.livroapi.controller;
+package com.biblioteca.livroapi;
 
-import com.miguelkrsoul.livroapi.model.Livro;
-import com.miguelkrsoul.livroapi.repository.LivroRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
 @RequestMapping("/livros")
+@CrossOrigin(origins = "*")
 public class LivroController {
 
-    @Autowired
-    private LivroRepository repository;
+    private final LivroRepository repo;
+
+    public LivroController(LivroRepository repo) {
+        this.repo = repo;
+    }
 
     @GetMapping
     public List<Livro> listar() {
-        return repository.findAll();
+        return repo.findAll();
     }
 
     @PostMapping
-    public Livro cadastrar(@RequestBody Livro livro) {
-        return repository.save(livro);
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<Livro> buscarPorId(@PathVariable Long id) {
-        return repository.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public Livro criar(@RequestBody Livro livro) {
+        return repo.save(livro);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletar(@PathVariable Long id) {
-        if (!repository.existsById(id)) {
-            return ResponseEntity.notFound().build();
-        }
-        repository.deleteById(id);
-        return ResponseEntity.noContent().build();
+    public void deletar(@PathVariable Long id) {
+        repo.deleteById(id);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Livro> atualizar(@PathVariable Long id, @RequestBody Livro novoLivro) {
-        return repository.findById(id)
-                .map(livro -> {
-                    livro.setTitulo(novoLivro.getTitulo());
-                    livro.setAutor(novoLivro.getAutor());
-                    return ResponseEntity.ok(repository.save(livro));
-                })
-                .orElse(ResponseEntity.notFound().build());
+    @GetMapping("/{id}")
+    public Livro buscar(@PathVariable Long id) {
+        return repo.findById(id).orElse(null);
     }
 }
