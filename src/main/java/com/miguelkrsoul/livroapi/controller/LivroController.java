@@ -1,5 +1,6 @@
 package com.biblioteca.livroapi;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -8,11 +9,8 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 public class LivroController {
 
-    private final LivroRepository repo;
-
-    public LivroController(LivroRepository repo) {
-        this.repo = repo;
-    }
+    @Autowired
+    private LivroRepository repo;
 
     @GetMapping
     public List<Livro> listar() {
