@@ -6,14 +6,15 @@
 <style>
 body{background:#0f0f19;color:#fff;font-family:Arial;margin:0;padding:20px}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:15px}
-.card{background:#1e1e2f;border-radius:12px;overflow:hidden;position:relative}
+.card{background:#1e1e2f;border-radius:12px;overflow:hidden;position:relative;cursor:pointer}
 .card img{width:100%;height:220px;object-fit:cover}
 .card div{padding:10px}
-.del{position:absolute;top:5px;right:5px;background:red;border:none;border-radius:50%;width:30px;height:30px;color:#fff;font-size:16px;cursor:pointer}
+.del{position:absolute;top:5px;right:5px;background:red;border:none;border-radius:50%;width:30px;height:30px;color:#fff;font-size:16px;cursor:pointer;z-index:2}
 .btn{background:#6c5ce7;color:#fff;border:none;padding:12px 20px;border-radius:8px;cursor:pointer}
-.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);justify-content:center;align-items:center;padding:20px;box-sizing:border-box;z-index:10}
-.modal-content{background:#1e1e2f;padding:20px;border-radius:12px;max-width:500px;width:100%}
+.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);justify-content:center;align-items:flex-start;padding:20px;box-sizing:border-box;z-index:10;overflow-y:auto}
+.modal-content{background:#1e1e2f;padding:20px;border-radius:12px;max-width:600px;width:100%;max-height:90vh;overflow-y:auto;margin-top:20px}
 input,textarea{width:100%;padding:10px;margin:8px 0;border-radius:6px;border:none;box-sizing:border-box}
+#mConteudo{white-space:pre-wrap;word-wrap:break-word;font-size:15px;line-height:1.7;background:#0f0f19;padding:15px;border-radius:8px;margin-top:12px;max-height:65vh;overflow-y:auto;display:block;border:1px solid #333}
 </style>
 </head>
 <body>
@@ -22,10 +23,10 @@ input,textarea{width:100%;padding:10px;margin:8px 0;border-radius:6px;border:non
 <div id="grid" class="grid"></div>
 
 <div id="addModal" class="modal"><div class="modal-content"><h2>+ Novo Livro</h2>
-<input id="nTitulo" placeholder="Título"><input id="nAutor" placeholder="Autor"><input id="nCapa" placeholder="Link da capa (pode deixar vazio)"><input id="nDesc" placeholder="Descrição"><textarea id="nConteudo" placeholder="Conteúdo do livro"></textarea>
+<input id="nTitulo" placeholder="Título"><input id="nAutor" placeholder="Autor"><input id="nCapa" placeholder="Link da capa (pode deixar vazio)"><input id="nDesc" placeholder="Descrição"><textarea id="nConteudo" rows="6" placeholder="Conteúdo do livro - pode ser grande, agora dá pra ler tudo!"></textarea>
 <button class="btn" onclick="salvar()">Salvar</button> <button class="btn" style="background:#444" onclick="document.getElementById('addModal').style.display='none'">Fechar</button><p id="msg"></p></div></div>
 
-<div id="modal" class="modal" onclick="this.style.display='none'"><div class="modal-content" onclick="event.stopPropagation()"><h2 id="mTitulo"></h2><p id="mAutor"></p><p id="mDesc"></p><p id="mConteudo" style="white-space:pre-wrap"></p></div></div>
+<div id="modal" class="modal" onclick="this.style.display='none'"><div class="modal-content" onclick="event.stopPropagation()"><h2 id="mTitulo"></h2><p id="mAutor" style="color:#aaa"></p><p id="mDesc" style="font-style:italic"></p><div id="mConteudo"></div><br><button class="btn" style="background:#444;width:100%" onclick="document.getElementById('modal').style.display='none'">Fechar Livro</button></div></div>
 
 <script>
 const API='https://livro-api-9t7z.onrender.com/livros';
@@ -34,8 +35,8 @@ async function carregar(){
  livros.forEach(l=>{
   let c=document.createElement('div'); c.className='card';
   let capa = l.capaUrl || 'https://via.placeholder.com/300x400/6c5ce7/ffffff?text='+encodeURIComponent(l.titulo);
-  c.innerHTML=`<button class="del" onclick="deletar(${l.id},event)">X</button><img src="${capa}" onerror="this.src='https://via.placeholder.com/300x400/6c5ce7/ffffff?text='+encodeURIComponent('${l.titulo}')"><div><b>${l.titulo}</b><br><small>${l.autor||''}</small></div>`;
-  c.onclick=()=>{mTitulo.innerText=l.titulo; mAutor.innerText=l.autor; mDesc.innerText=l.descricao; mConteudo.innerText=l.conteudo||''; document.getElementById('modal').style.display='flex';};
+  c.innerHTML=`<button class="del" onclick="deletar(${l.id},event)">X</button><img src="${capa}" onerror="this.src='https://via.placeholder.com/300x400/6c5ce7/ffffff?text=${encodeURIComponent(l.titulo)}'"><div><b>${l.titulo}</b><br><small>${l.autor||''}</small></div>`;
+  c.onclick=()=>{mTitulo.innerText=l.titulo; mAutor.innerText=l.autor||''; mDesc.innerText=l.descricao||''; mConteudo.innerText=l.conteudo||'Sem conteúdo'; document.getElementById('modal').style.display='flex';};
   g.appendChild(c);
  });
 }
@@ -44,7 +45,7 @@ async function salvar(){
  let livro={titulo:nTitulo.value, autor:nAutor.value, capaUrl:nCapa.value, descricao:nDesc.value, conteudo:nConteudo.value};
  if(!livro.titulo) return alert('Título obrigatório');
  await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(livro)});
- document.getElementById('addModal').style.display='none'; carregar();
+ document.getElementById('addModal').style.display='none'; nTitulo.value=nAutor.value=nCapa.value=nDesc.value=nConteudo.value=''; carregar();
 }
 carregar();
 </script>
